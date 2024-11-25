@@ -1,0 +1,190 @@
+.shipment-report-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  padding-left: 270px; 
+  padding-right: 20px; 
+  width: calc(100% - 290px); 
+}
+
+.summary-row {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 40px;
+  width: 100%;
+  margin-left: 20px;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center; 
+  padding: 10px 20px;
+  width: 250px; 
+  height: 100px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  margin-bottom: 20px;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
+
+.card-content {
+  display: flex;
+  align-items: center; 
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.card-icon {
+  width: 80px;
+  height: 80px;
+  margin-right: 20px;
+}
+
+.card-text h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 400;
+  margin-left: 20px;
+  padding-bottom: 10px;
+}
+
+.card-text .number {
+  margin: 0;
+  font-size: 24px;
+  color: #005a5f;
+  margin-left: 20px;
+}
+
+.card-text {
+  display: flex;
+  flex-direction: column; 
+  justify-content: center;
+}
+
+.count-wrapper {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+}
+
+.card-text p {
+  margin: 0;
+  font-size: 24px;
+  color: #005a5f;
+  margin-right: 20px;
+}
+
+.percentage-increase {
+  font-size: 18px;
+  color: #28a745;
+  display: flex;
+  align-items: center;
+  margin-left: 30px;
+}
+
+.mat-icon {
+  font-size: 20px;
+  margin-left: 5px;
+}
+
+.shipment-table-container {
+  width: 100%;
+  margin-top: 40px;
+}
+
+.shipment-report-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;  
+  margin-top: 20px;
+  padding-left: 270px; 
+  padding-right: 20px; 
+  width: calc(100% - 290px);
+}
+
+.table-title {
+  font-size: 20px;
+  margin-bottom: 10px;
+  text-align: left; 
+  width: 100%; 
+}
+
+.shipment-table-container {
+  width: 100%;
+  margin-top: 5px; 
+}
+
+mat-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+mat-header-cell, mat-cell {
+  padding: 12px;
+  text-align: left;
+}
+
+mat-header-cell {
+  background-color: #f1f1f1;
+}
+
+mat-row {
+  border-bottom: 1px solid #ddd;
+}
+
+mat-row:hover {
+  background-color: #f9f9f9;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: white;
+}
+
+.delivered {
+  background-color: #4caf50; /* Green for Delivered */
+}
+
+.on-hold {
+  background-color: #f44336; /* Red for On Hold */
+}
+
+.in-transit {
+  background-color: #ff9800; /* Orange for In Transit */
+}
+
+.mat-icon-button {
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .shipment-report-container {
+    padding-left: 20px; 
+    width: 100%;
+  }
+
+  .summary-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .card {
+    width: 100%; 
+    margin-bottom: 10px;
+  }
+
+  mat-table {
+    font-size: 14px; 
+  }
+}
+

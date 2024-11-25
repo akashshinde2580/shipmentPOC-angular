@@ -1,0 +1,57 @@
+.sidebar {
+  height: 100%;
+  width: 250px;
+  background-color: #333333;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0;
+  z-index: 1000;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  transition: transform 0.3s ease;
+}
+
+.logo-container:hover .logo {
+  transform: scale(1.1);
+}
+
+.nav-links {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  color: white;
+  text-decoration: none;
+}
+
+.nav-item mat-icon {
+  margin-right: 15px;
+  font-size: 25px;
+}
+
+span {
+  font-size: 18px;
+}
+
+.nav-item:hover {
+  background-color: #444;
+}
