@@ -3,116 +3,116 @@ import { ShipmentService } from '../shipment.service';
 import { Shipment } from './shipment.interface';
 import { HttpErrorResponse } from '@angular/common/http';
 
-
 @Component({
   selector: 'app-summary-row',
   templateUrl: './summary-row.component.html',
-  styleUrls: ['./summary-row.component.scss']
+  styleUrls: ['./summary-row.component.scss'],
 })
-export class SummaryRowComponent  {
-
-  // summaryData = [
-  //   {
-  //     title: 'In Transit',
-  //     count: 120,
-  //     image: 'assets/transit.png',
-  //     percentage: 5, 
-  //   },
-  //   {
-  //     title: 'Shipped',
-  //     count: 250,
-  //     image: 'assets/shipped.png',
-  //     percentage: 8, 
-  //   },
-  //   {
-  //     title: 'Delivered',
-  //     count: 150,
-  //     image: 'assets/delivered.png',
-  //     percentage: 12, 
-  //   }
-  // ];
+export class SummaryRowComponent {
+  displayedColumns: string[] = [
+    'shipmentId',
+    'orderId',
+    'status',
+    'senderName',
+    'senderAddress',
+    'receiverName',
+    'receiverAddress',
+    'trackingNumber',
+    'shipmentDate',
+    'action',
+  ];
 
   summaryData: any[] = [];
-
-  // shipmentData: ShipmentResponse = { status: '', shipments: [] };  // Initialize with empty data
-  displayedColumns: string[] = [
-    'shipmentId', 'orderId', 'status', 'senderName', 'receiverName', 'trackingNumber', 'shipmentDate', 'action'
-  ];
   shipmentData: Shipment[] = [];
+row: any;
 
-  constructor(private shipmentService: ShipmentService){}
+  constructor(private shipmentService: ShipmentService) {}
 
   ngOnInit(): void {
-    console.log("I am here")
-    console.log(this.summaryData)
+    console.log('I am here');
+    console.log(this.summaryData);
     this.fetchShipments();
     this.fetchShipmentStatusCounts();
   }
-  
-  fetchShipments(): void {
-    console.log("In fetchShipments");
 
-    this.shipmentData =  this.shipmentService.getAllShipments();
-    // this.shipmentService.getAllShipments().subscribe(
-    //   (data: ShipmentResponse) => {
-    //     console.log('Fetched shipments:', data);  // Check if data is returned
-    //     this.shipmentData = data;  // Assign the fetched data to the object
-    //   },
-    //   (error) => {
-    //     console.error('Error fetching shipment data', error);
-    //   }
-    // );
-    
-    this.shipmentService.getAllShipments().subscribe((data : Shipment[]) => {
-      console.log(data);
-      this.shipmentData = data; 
-      console.log(this.shipmentData)
-      return this.shipmentData
-    },
-    (error : HttpErrorResponse) => {
-      console.error('Error fetching shipment data', error);
-    });
+  fetchShipments(): void {
+    console.log('In fetchShipments');
+
+    this.shipmentData = this.shipmentService.getAllShipments();
+    this.shipmentService.getAllShipments().subscribe(
+      (data: Shipment[]) => {
+        console.log(data);
+        this.shipmentData = data;
+        console.log(this.shipmentData);
+        return this.shipmentData;
+      },
+      (error: HttpErrorResponse) => {
+        console.error('Error fetching shipment data', error);
+      }
+    );
   }
 
+  getStatusClass(status: string): string {
+    switch (status) {
+      case 'COMPLETED':
+        return 'status-completed';
+      case 'IN_TRANSIT':
+        return 'status-in-transit';
+      case 'SHIPPED':
+        return 'status-shipped';
+      default:
+        return '';
+    }
+  }
+  
+
   fetchShipmentStatusCounts(): void {
-    const statuses: Array<'Delivered' | 'In Transit' | 'Cancelled'> = ['Delivered', 'In Transit', 'Cancelled'];
-  
-    const statusImages: { [key in 'Delivered' | 'In Transit' | 'Cancelled']: string } = {
-      Delivered: 'assets/delivered.png',
-      'In Transit': 'assets/transit.png',
-      Cancelled: 'assets/shipped.png',
+    console.log('Fetching shipment counts by status...');
+    const statuses: Array<'IN_TRANSIT' | 'SHIPPED' | 'COMPLETED'> = [
+      'IN_TRANSIT',
+      'SHIPPED',
+      'COMPLETED',
+    ];
+
+    const statusImages: {
+      [key in 'IN_TRANSIT' | 'SHIPPED' | 'COMPLETED']: string;
+    } = {
+      IN_TRANSIT: 'assets/transit.png',
+      SHIPPED: 'assets/shipped.png',
+      COMPLETED: 'assets/delivered.png',
     };
-  
-    const statusTitles: { [key in 'Delivered' | 'In Transit' | 'Cancelled']: string } = {
-      Delivered: 'Delivered Shipments',
-      'In Transit': 'In Transit Shipments',
-      Cancelled: 'Cancelled Shipments',
+
+    const statusTitles: {
+      [key in 'IN_TRANSIT' | 'SHIPPED' | 'COMPLETED']: string;
+    } = {
+      IN_TRANSIT: 'In Transit',
+      SHIPPED: 'Shipped',
+      COMPLETED: 'Completed',
     };
-  
+
     this.summaryData = [];
-  
+
     statuses.forEach((status) => {
       console.log(`Fetching count for status: ${status}`);
       this.shipmentService.getShipmentCountByStatus(status).subscribe(
         (response) => {
-          console.log(`Response for ${status}:`, response);
-  
+          console.log(`Response for status "${status}":`, response);
+
           this.summaryData.push({
             title: statusTitles[status],
             count: response.count,
             image: statusImages[status],
           });
-  
-          console.log(`Updated summaryData:`, this.summaryData);
+
+          console.log(`Updated summaryData for "${status}":`, this.summaryData);
         },
         (error: HttpErrorResponse) => {
-          console.error(`Error fetching count for status ${status}`, error);
+          console.error(`Error fetching count for status "${status}":`, error);
         }
       );
     });
   }
-  
-  
+
   onView(row: any) {
     console.log('View action', row);
   }

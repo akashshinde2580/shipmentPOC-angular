@@ -145,22 +145,26 @@ mat-row:hover {
   background-color: #f9f9f9;
 }
 
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 12px;
-  color: white;
+.status-box {
+  display: inline-flex; 
+  align-items: center; 
+  color: white; 
+  font-size: 14px; 
+  line-height: normal; 
+  height: auto; 
+  white-space: nowrap; 
 }
 
-.delivered {
-  background-color: #4caf50; /* Green for Delivered */
+.status-completed {
+  background-color: #4caf50; 
 }
 
-.on-hold {
-  background-color: #f44336; /* Red for On Hold */
+.status-in-transit {
+  background-color: #ff9800; 
 }
 
-.in-transit {
-  background-color: #ff9800; /* Orange for In Transit */
+.status-shipped {
+  background-color: #2196f3;
 }
 
 .mat-icon-button {
