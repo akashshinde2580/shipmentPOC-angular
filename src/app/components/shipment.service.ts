@@ -27,5 +27,9 @@ export class ShipmentService {
   getAllShipments() : any{
     return this.http.get(this.apiUrl)
   }
+
+  getShipmentCountByStatus(status: string): Observable<{ count: number }> {
+    return this.http.get<{ count: number }>(`${this.apiUrl}/status/${status}`);
+  }
 }
 
