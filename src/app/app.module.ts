@@ -13,6 +13,9 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { SummaryRowComponent } from './components/summary-row/summary-row.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ShipmentService } from './components/shipment.service';
+import { ShipmentDetailsModalComponent } from './components/shipment-details-modal/shipment-details-modal.component';
+import { MatDialogModule } from '@angular/material/dialog';
+
 
 
 @NgModule({
@@ -21,6 +24,7 @@ import { ShipmentService } from './components/shipment.service';
     HeaderComponent,
     SidebarComponent,
     SummaryRowComponent,
+    ShipmentDetailsModalComponent
   ],
   imports: [
     BrowserModule,
@@ -31,7 +35,8 @@ import { ShipmentService } from './components/shipment.service';
     MatMenuModule,
     MatBadgeModule,
     MatTableModule,
-    HttpClientModule
+    HttpClientModule,
+    MatDialogModule
   ],
   providers: [ShipmentService],
   bootstrap: [AppComponent]

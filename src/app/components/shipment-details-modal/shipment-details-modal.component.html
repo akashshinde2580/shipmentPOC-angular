@@ -1,0 +1,17 @@
+<h2 mat-dialog-title class="title">Shipment Details</h2>
+<div mat-dialog-content>
+  <p><strong>Shipment ID :</strong> {{ data.shipment.shipmentId }}</p>
+  <p><strong>Order ID :</strong> {{ data.shipment.orderId }}</p>
+  <p><strong>Status :</strong> {{ data.shipment.status }}</p>
+  <!-- <p><strong>Sender :</strong> {{ data.shipment.senderName }}</p> -->
+  <p><strong>Sender :</strong> {{ data.shipment.senderAddress }}</p>
+  <!-- <p><strong>Receiver :</strong> {{ data.shipment.receiverName }}</p> -->
+  <p><strong>Receiver :</strong> {{ data.shipment.receiverAddress }}</p>
+  <p><strong>Tracking Number :</strong> {{ data.shipment.trackingNumber }}</p>
+  <p><strong>Shipment Date :</strong> {{ data.shipment.shipmentDate | date }}</p>
+</div>
+<div mat-dialog-actions class="dialog-actions">
+    <button mat-raised-button color="primary" mat-dialog-close class="close-button">
+      Close
+    </button>
+    </div>
