@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ShipmentService } from '../shipment.service';
 import { Shipment } from './shipment.interface';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MatDialog } from '@angular/material/dialog';
+import { ShipmentDetailsModalComponent } from '../shipment-details-modal/shipment-details-modal.component';
 
 @Component({
   selector: 'app-summary-row',
@@ -13,9 +15,7 @@ export class SummaryRowComponent {
     'shipmentId',
     'orderId',
     'status',
-    'senderName',
     'senderAddress',
-    'receiverName',
     'receiverAddress',
     'trackingNumber',
     'shipmentDate',
@@ -26,7 +26,7 @@ export class SummaryRowComponent {
   shipmentData: Shipment[] = [];
 row: any;
 
-  constructor(private shipmentService: ShipmentService) {}
+  constructor(private shipmentService: ShipmentService , private dialog: MatDialog) {}
 
   ngOnInit(): void {
     console.log('I am here');
@@ -110,6 +110,13 @@ row: any;
           console.error(`Error fetching count for status "${status}":`, error);
         }
       );
+    });
+  }
+
+  onViewEye(row: Shipment): void {
+    this.dialog.open(ShipmentDetailsModalComponent, {
+      width: '500px',
+      data: { shipment: row }, 
     });
   }
 
