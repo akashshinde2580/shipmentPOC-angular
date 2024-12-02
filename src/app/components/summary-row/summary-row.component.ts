@@ -1,16 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { ShipmentService } from '../shipment.service';
 import { Shipment } from './shipment.interface';
 import { HttpErrorResponse } from '@angular/common/http';
 import { MatDialog } from '@angular/material/dialog';
 import { ShipmentDetailsModalComponent } from '../shipment-details-modal/shipment-details-modal.component';
+import { Chart, registerables } from 'chart.js';
+Chart.register(...registerables);
+
 
 @Component({
   selector: 'app-summary-row',
   templateUrl: './summary-row.component.html',
   styleUrls: ['./summary-row.component.scss'],
 })
-export class SummaryRowComponent {
+export class SummaryRowComponent implements OnInit, AfterViewInit  {
   displayedColumns: string[] = [
     'shipmentId',
     'orderId',
@@ -22,28 +25,40 @@ export class SummaryRowComponent {
     'action',
   ];
 
-  summaryData: any[] = [];
+  summaryData: {
+    title: string;
+    count: number;
+    image: string;
+    status: 'IN_TRANSIT' | 'SHIPPED' | 'COMPLETED'; 
+  }[] = [];
   shipmentData: Shipment[] = [];
-row: any;
+  row: any;
+
+  statusColors: {
+    [key in 'IN_TRANSIT' | 'SHIPPED' | 'COMPLETED']: { background: string; border: string };
+  } = {
+    IN_TRANSIT: { background: '#ff9800', border: '#0277BD' },
+    SHIPPED: { background: '#2196f3', border: '#F57F17' },
+    COMPLETED: { background: '#4caf50', border: '#2E7D32' },
+  };
 
   constructor(private shipmentService: ShipmentService , private dialog: MatDialog) {}
 
   ngOnInit(): void {
-    console.log('I am here');
-    console.log(this.summaryData);
     this.fetchShipments();
     this.fetchShipmentStatusCounts();
   }
 
-  fetchShipments(): void {
-    console.log('In fetchShipments');
+  ngAfterViewInit(): void {
+    this.renderBarChart();
+  }
 
+  //Method to fetch shipments
+  fetchShipments(): void {
     this.shipmentData = this.shipmentService.getAllShipments();
     this.shipmentService.getAllShipments().subscribe(
       (data: Shipment[]) => {
-        console.log(data);
         this.shipmentData = data;
-        console.log(this.shipmentData);
         return this.shipmentData;
       },
       (error: HttpErrorResponse) => {
@@ -52,6 +67,7 @@ row: any;
     );
   }
 
+  // Change status badge colors
   getStatusClass(status: string): string {
     switch (status) {
       case 'COMPLETED':
@@ -64,10 +80,9 @@ row: any;
         return '';
     }
   }
-  
 
+  // fetch the status counts 
   fetchShipmentStatusCounts(): void {
-    console.log('Fetching shipment counts by status...');
     const statuses: Array<'IN_TRANSIT' | 'SHIPPED' | 'COMPLETED'> = [
       'IN_TRANSIT',
       'SHIPPED',
@@ -82,9 +97,7 @@ row: any;
       COMPLETED: 'assets/delivered.png',
     };
 
-    const statusTitles: {
-      [key in 'IN_TRANSIT' | 'SHIPPED' | 'COMPLETED']: string;
-    } = {
+    const statusTitles: { [key in 'IN_TRANSIT' | 'SHIPPED' | 'COMPLETED']: string } = {
       IN_TRANSIT: 'In Transit',
       SHIPPED: 'Shipped',
       COMPLETED: 'Completed',
@@ -93,29 +106,118 @@ row: any;
     this.summaryData = [];
 
     statuses.forEach((status) => {
-      console.log(`Fetching count for status: ${status}`);
       this.shipmentService.getShipmentCountByStatus(status).subscribe(
         (response) => {
-          console.log(`Response for status "${status}":`, response);
 
           this.summaryData.push({
             title: statusTitles[status],
-            count: response.count,
+            count: Math.round(response.count), 
             image: statusImages[status],
+            status: status, 
           });
-
-          console.log(`Updated summaryData for "${status}":`, this.summaryData);
+          this.renderBarChart();
         },
-        (error: HttpErrorResponse) => {
+        (error) => {
           console.error(`Error fetching count for status "${status}":`, error);
         }
       );
     });
   }
 
+  //Bar chart
+  renderBarChart(): void {
+    if (this.summaryData.length === 0) {
+      console.warn('No data available for rendering the bar chart.');
+      return;
+    }
+
+    const labels = this.summaryData.map((item) => item.title);
+    const counts = this.summaryData.map((item) => item.count);
+    const backgroundColors = this.summaryData.map((item) => this.statusColors[item.status].background);
+    const borderColors = this.summaryData.map((item) => this.statusColors[item.status].border);
+    const totalCount = counts.reduce((acc, count) => acc + count, 0);
+
+    const totalCountPlugin = {
+      id: 'totalCount',
+      beforeDraw: (chart: any) => {
+        const ctx = chart.ctx;
+        const width = chart.width;
+        const top = chart.chartArea.top;
+
+        ctx.save();
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = 'black';
+        ctx.fillText(`Total Count: ${totalCount}`, width / 2, top - 10);
+        ctx.restore();
+      },
+    };
+
+    const chartElement = document.getElementById('statusBarChart') as HTMLCanvasElement;
+    if (chartElement) {
+      Chart.getChart(chartElement)?.destroy();
+    }
+
+    new Chart(chartElement, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Shipment Status Counts',
+            data: counts,
+            backgroundColor: backgroundColors,
+            borderColor: borderColors,
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: {
+          padding: {
+            top: 25,
+          },
+        },
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `Count: ${context.raw}`,
+            },
+          },
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Status',
+            },
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Count',
+            },
+            ticks: {
+              stepSize: 1,
+              callback: (value) => value.toString(),
+            },
+          },
+        },
+      },
+      plugins: [totalCountPlugin],
+    }); 
+  }
+  
+  //eye icon
   onViewEye(row: Shipment): void {
     this.dialog.open(ShipmentDetailsModalComponent, {
-      width: '500px',
+      width: '600px',
       data: { shipment: row }, 
     });
   }
@@ -126,5 +228,5 @@ row: any;
 
   onEdit(row: any) {
     console.log('Edit action', row);
-  }
+  } 
 }
