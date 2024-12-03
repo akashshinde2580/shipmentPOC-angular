@@ -136,6 +136,8 @@ export class SummaryRowComponent implements OnInit, AfterViewInit  {
     const backgroundColors = this.summaryData.map((item) => this.statusColors[item.status].background);
     const borderColors = this.summaryData.map((item) => this.statusColors[item.status].border);
     const totalCount = counts.reduce((acc, count) => acc + count, 0);
+    const yAxisMax = totalCount * 2.0;
+
 
     const totalCountPlugin = {
       id: 'totalCount',
@@ -199,6 +201,7 @@ export class SummaryRowComponent implements OnInit, AfterViewInit  {
           },
           y: {
             beginAtZero: true,
+            max : yAxisMax,
             title: {
               display: true,
               text: 'Count',
