@@ -15,8 +15,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ShipmentService } from './components/shipment.service';
 import { ShipmentDetailsModalComponent } from './components/shipment-details-modal/shipment-details-modal.component';
 import { MatDialogModule } from '@angular/material/dialog';
-
-
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
   declarations: [
@@ -24,7 +23,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     HeaderComponent,
     SidebarComponent,
     SummaryRowComponent,
-    ShipmentDetailsModalComponent
+    ShipmentDetailsModalComponent,
   ],
   imports: [
     BrowserModule,
@@ -36,7 +35,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     MatBadgeModule,
     MatTableModule,
     HttpClientModule,
-    MatDialogModule
+    MatDialogModule,
+    MatPaginatorModule
   ],
   providers: [ShipmentService],
   bootstrap: [AppComponent]
