@@ -7,6 +7,7 @@ import { ShipmentDetailsModalComponent } from '../shipment-details-modal/shipmen
 import { Chart, registerables } from 'chart.js';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
 Chart.register(...registerables);
 
 @Component({
@@ -35,7 +36,10 @@ export class SummaryRowComponent implements OnInit, AfterViewInit {
   shipmentData: Shipment[] = [];
 
   shipmentDataSource = new MatTableDataSource<Shipment>();
+  @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+  shipmentCountsByDate: { date: string; count: number }[] = [];
 
   row: any;
 
@@ -62,11 +66,17 @@ export class SummaryRowComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.renderBarChart();
-    this.initializeTrendlineChart();
+    this.renderTrendlineChart();
     this.shipmentDataSource.paginator = this.paginator;
+    this.shipmentDataSource.sort = this.sort;
   }
 
-  //Method to fetch shipments and paginator
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.shipmentDataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  //Method to Fetch Shipments and Paginator
   fetchShipments(): void {
     this.shipmentData = this.shipmentService.getAllShipments();
     this.shipmentService.getAllShipments().subscribe(
@@ -74,6 +84,8 @@ export class SummaryRowComponent implements OnInit, AfterViewInit {
         this.shipmentData = data;
         this.shipmentDataSource.data = this.shipmentData;
         this.shipmentDataSource.paginator = this.paginator;
+
+        this.groupShipmentsByDate();
       },
       (error: HttpErrorResponse) => {
         console.error('Error fetching shipment data', error);
@@ -81,7 +93,7 @@ export class SummaryRowComponent implements OnInit, AfterViewInit {
     );
   }
 
-  // Method to fetch the status counts
+  // Method to Fetch the Status Counts
   fetchShipmentStatusCounts(): void {
     const statuses: Array<'IN_TRANSIT' | 'SHIPPED' | 'COMPLETED'> = [
       'IN_TRANSIT',
@@ -238,74 +250,84 @@ export class SummaryRowComponent implements OnInit, AfterViewInit {
     });
   }
 
+  //Group Shipmenmts By Date
+  groupShipmentsByDate(): void {
+    const shipmentCounts: { [key: string]: number } = {};
+
+    this.shipmentData.forEach((shipment) => {
+      const date = new Date(shipment.shipmentDate).toLocaleDateString();
+      shipmentCounts[date] = (shipmentCounts[date] || 0) + 1;
+    });
+
+    this.shipmentCountsByDate = Object.keys(shipmentCounts).map((date) => ({
+      date,
+      count: shipmentCounts[date],
+    }));
+
+    this.renderTrendlineChart();
+  }
+
   //Trendline chart
-  initializeTrendlineChart() {
-    // Sample shipment data
-    const shipmentDates = [
-      '2024-12-01',
-      '2024-12-02',
-      '2024-12-03',
-      '2024-12-04',
-    ];
-    const shipmentCounts = [0, 3, 5, 7];
+  renderTrendlineChart(): void {
+    if (this.shipmentCountsByDate.length === 0) {
+      console.warn('No data available for rendering the trendline chart.');
+      return;
+    }
 
-    const formattedDates = shipmentDates.map((date) =>
-      new Date(date).toLocaleDateString()
-    );
+    const dates = this.shipmentCountsByDate.map((item) => item.date);
+    const counts = this.shipmentCountsByDate.map((item) => item.count);
 
-    const trendlineValues = this.calculateTrendlineChart(shipmentCounts);
+    const chartElement = document.getElementById(
+      'shipmentTrendlineChart'
+    ) as HTMLCanvasElement;
+    if (chartElement) {
+      Chart.getChart(chartElement)?.destroy();
+    }
 
-    const ctx = document.getElementById('trendlineChart') as HTMLCanvasElement;
-    new Chart(ctx, {
+    new Chart(chartElement, {
       type: 'line',
       data: {
-        labels: formattedDates, 
+        labels: dates,
         datasets: [
           {
-            label: 'Shipment Count',
-            data: shipmentCounts,
-            borderColor: '#2196f3',
-            backgroundColor: 'rgba(33, 150, 243, 0.2)',
-            borderWidth: 2,
-            fill: true, 
-            pointRadius: 5,
-          },
-          {
-            label: 'Trendline',
-            data: trendlineValues,
-            borderColor: '#ff9800',
-            borderWidth: 2,
-            borderDash: [5, 5], 
+            label: 'Shipments Over Time',
+            data: counts,
             fill: false,
+            borderColor: '#2196f3',
+            tension: 0.1,
+            borderWidth: 3,
+            pointRadius: 4,
+            pointBackgroundColor: '#2196f3',
           },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'top',
-          },
-          tooltip: {
-            callbacks: {
-              label: (context) => `${context.dataset.label}: ${context.raw}`,
-            },
-          },
-        },
         scales: {
           x: {
             title: {
               display: true,
               text: 'Date',
             },
+            ticks: {
+              maxRotation: 45,
+              minRotation: 45,
+            },
           },
           y: {
             beginAtZero: true,
+            max: 6,
             title: {
               display: true,
               text: 'Shipment Count',
+            },
+          },
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (context) => `Count: ${context.raw}`,
             },
           },
         },
@@ -313,26 +335,7 @@ export class SummaryRowComponent implements OnInit, AfterViewInit {
     });
   }
 
-  calculateTrendlineChart(data: number[]): number[] {
-    const n = data.length;
-    const xAvg = (n + 1) / 2;
-    const yAvg = data.reduce((sum, y) => sum + y, 0) / n;
-
-    const numerator = data.reduce(
-      (sum, y, x) => sum + (x + 1 - xAvg) * (y - yAvg),
-      0
-    );
-    const denominator = data.reduce(
-      (sum, _, x) => sum + Math.pow(x + 1 - xAvg, 2),
-      0
-    );
-    const slope = numerator / denominator;
-    const intercept = yAvg - slope * xAvg;
-
-    return data.map((_, x) => slope * (x + 1) + intercept);
-  }
-
-  //eye icon
+  //Eye Icon for Shipment Details
   onViewEye(row: Shipment): void {
     this.dialog.open(ShipmentDetailsModalComponent, {
       width: '600px',

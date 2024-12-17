@@ -210,12 +210,12 @@ mat-row:hover {
 }
 
 .chart-wrapper {
-  display: flex; /* Use Flexbox for horizontal alignment */
-  justify-content: space-between; /* Add space between charts */
-  gap: 20px; /* Add some spacing between the two charts */
+  display: flex; 
+  justify-content: space-between; 
+  gap: 20px; 
   margin: 20px auto;
   padding: 20px;
-  max-width: 1200px; /* Ensure it doesn't stretch too far */
+  max-width: 1200px; 
   background: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -233,5 +233,38 @@ mat-row:hover {
 
 canvas {
   width: 100%;
-  height: 300px; /* Adjust height for better visualization */
+  height: 300px; 
+}
+
+.search-container {
+  padding: 10px; 
+  background-color: #ffffff;
+  border-radius: 8px; 
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+mat-form-field input {
+  font-size: 15px; 
+  color: #333; 
+}
+
+mat-form-field .mat-form-field-outline {
+  border-color: #2196f3; 
+}
+
+mat-form-field .mat-form-field-outline:hover {
+  border-color: #1976d2; 
+}
+
+mat-form-field .mat-form-field-outline-thick {
+  border-width: 2px; 
+}
+
+::placeholder {
+  color: #aaa; 
+  font-style: italic;
 }
