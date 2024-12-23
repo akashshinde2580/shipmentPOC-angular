@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,8 +16,10 @@ import { ShipmentService } from './components/shipment.service';
 import { ShipmentDetailsModalComponent } from './components/shipment-details-modal/shipment-details-modal.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
 
 @NgModule({
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   declarations: [
     AppComponent,
     HeaderComponent,
@@ -36,7 +38,9 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatTableModule,
     HttpClientModule,
     MatDialogModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatSortModule,
+    BrowserAnimationsModule,
   ],
   providers: [ShipmentService],
   bootstrap: [AppComponent]
